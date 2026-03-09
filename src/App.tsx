@@ -1,44 +1,70 @@
 import { useState } from "react";
 
 export default function App() {
+  const [set, setSet] = useState("");
+  const [cep, setCep] = useState("");
+  const [results, setResults] = useState<any>(null);
+  const [error, setError] = useState("");
 
-  const [results, setResults] = useState<any[]>([]);
+  async function buscar() {
+    setError("");
+    setResults(null);
 
-  function buscar() {
-
-    const data = [
-      { loja: "Mercado Livre", preco: 420, desconto: "46%", link: "https://mercadolivre.com.br" },
-      { loja: "Shopee", preco: 399, desconto: "49%", link: "https://shopee.com.br" },
-      { loja: "Amazon", preco: 510, desconto: "34%", link: "https://amazon.com.br" }
-    ];
-
-    setResults(data);
+    try {
+      const res = await fetch(`/api/search?set=${set}&cep=${cep}`);
+      const data = await res.json();
+      setResults(data);
+    } catch (err) {
+      setError("Erro ao buscar dados.");
+    }
   }
 
   return (
-    <div style={{padding:30,fontFamily:"Arial"}}>
-
+    <div style={{ padding: 30, fontFamily: "Arial" }}>
       <h1>Garimpo LEGO Brasil</h1>
 
-      <input placeholder="Set LEGO" style={{padding:10,marginRight:10}} />
+      <p>Top 5 novos + Top 5 usados • LEGO original • links diretos</p>
 
-      <input placeholder="CEP âncora" style={{padding:10,marginRight:10}} />
+      <div style={{ marginTop: 20 }}>
+        <input
+          placeholder="Set LEGO"
+          value={set}
+          onChange={(e) => setSet(e.target.value)}
+          style={{ marginRight: 10 }}
+        />
 
-      <button onClick={buscar} style={{padding:10}}>
-        Buscar agora
-      </button>
+        <input
+          placeholder="CEP âncora"
+          value={cep}
+          onChange={(e) => setCep(e.target.value)}
+          style={{ marginRight: 10 }}
+        />
 
-      <div style={{marginTop:30}}>
-
-        {results.map((r,i)=>(
-          <div key={i} style={{marginBottom:10}}>
-            {r.loja} — R${r.preco} ({r.desconto})  
-            <a href={r.link} target="_blank"> Abrir</a>
-          </div>
-        ))}
-
+        <button onClick={buscar}>
+          Buscar agora
+        </button>
       </div>
 
+      {error && (
+        <p style={{ color: "red", marginTop: 20 }}>
+          {error}
+        </p>
+      )}
+
+      {results && results.resultados && (
+        <div style={{ marginTop: 30 }}>
+          <h3>Resultados</h3>
+
+          {results.resultados.map((r: any, i: number) => (
+            <div key={i} style={{ marginBottom: 10 }}>
+              {r.loja} — R${r.preco} ({r.desconto}){" "}
+              <a href={r.link} target="_blank">
+                Abrir
+              </a>
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
