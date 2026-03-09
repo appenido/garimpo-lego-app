@@ -21,7 +21,7 @@ export default function App() {
 
   return (
     <div style={{ padding: 30, fontFamily: "Arial" }}>
-      <h1>Garimpo LEGO Brasil</h1>
+      <h1>Garimpo LEGO Brasil v2</h1>
 
       <p>Top 5 novos + Top 5 usados • LEGO original • links diretos</p>
 
